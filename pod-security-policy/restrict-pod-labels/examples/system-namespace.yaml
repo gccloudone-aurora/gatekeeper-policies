@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: deltaquadrant
+  labels:
+    namespace.ssc-spc.gc.ca/purpose: system

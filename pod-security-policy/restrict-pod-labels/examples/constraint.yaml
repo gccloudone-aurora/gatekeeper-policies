@@ -1,0 +1,22 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RestrictPodLabels
+metadata:
+  name: restrict-pod-labels
+spec:
+  match:
+    namespaceSelector:
+      matchExpressions:
+        - key: namespace.ssc-spc.gc.ca/purpose
+          operator: In
+          values:
+            - solution
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    labels:
+    - galley.istio.io/analyze-suppress
+    - networking.istio.io/gatewayPort
+    - topology.istio.io/network
+    - sidecar.istio.io/inject
+    - topology.istio.io/subzone

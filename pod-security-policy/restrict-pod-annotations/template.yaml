@@ -1,0 +1,33 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: restrictpodannotations
+spec:
+  crd:
+    spec:
+      names:
+        kind: RestrictPodAnnotations
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          type: object
+          properties:
+            labels:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |-
+       package restrictpodannotations
+      
+       violation[{"msg": msg, "details": {"pod_annotations": not_allow}}] {
+          disallowed := {annotations | annotations := input.parameters.annotations[_]}
+          provided   := {annotations | input.review.object.metadata.annotations[annotations]}
+
+          # disallowed should be a non empty intersection of provided to return false
+          not_allow  := provided & disallowed
+          count(not_allow) > 0
+
+          msg := sprintf("You are not allowed to use the following annotations: %v", [not_allow])
+        }

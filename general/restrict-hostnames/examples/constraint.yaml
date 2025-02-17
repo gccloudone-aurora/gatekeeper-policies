@@ -1,0 +1,19 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RestrictHostnames
+metadata:
+  name: restrict-hostnames
+spec:
+  match:
+    kinds:
+      - apiGroups: ["networking.k8s.io"]
+        kinds: ["Ingress"]
+      - apiGroups: ["networking.istio.io"]
+        kinds: ["VirtualService"]
+      - apiGroups: ["networking.istio.io"]
+        kinds: ["DestinationRule"]
+  parameters:
+    # Hostnames that should be exempt from the policy. Glob patterns can be specified.
+    exemptions:
+      - '*.example.ca'
+    # Extra information that should be appended to the error message.
+    errorMsgAdditionalDetails: ""

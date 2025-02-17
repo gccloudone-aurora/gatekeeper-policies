@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata: 
+  name: prod
+  namespace: test
+spec: 
+  rules: 
+  - host: test.ca
+    http: 
+      paths:
+      - path: /FINANCE
+        backend: 
+          serviceName: banking
+          servicePort: 443
+      - path: /finANCE/billing
+        backend: 
+          serviceName: banking
+          servicePort: 443

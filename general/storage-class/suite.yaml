@@ -1,0 +1,59 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: storageclass
+tests:
+- name: storageclass
+  template: template.yaml
+  constraint: examples/storage-class/constraint.yaml
+  cases:
+  - name: example-allowed-pvc
+    object: examples/storage-class/example_allowed_pvc.yaml
+    inventory:
+    - examples/storage-class/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-pvc-empty-storageclass
+    object: examples/storage-class/example_allowed_pvc_empty_storageclass.yaml
+    inventory:
+    - examples/storage-class/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: example-allowed-ss
+    object: examples/storage-class/example_allowed_ss.yaml
+    inventory:
+    - examples/storage-class/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: example-disallowed-pvc-badname
+    object: examples/storage-class/example_disallowed_pvc_badname.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-ssvct-badnamename
+    object: examples/storage-class/example_disallowed_ssvct_badnamename.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-pvc-nonamename
+    object: examples/storage-class/example_disallowed_pvc_nonamename.yaml
+    assertions:
+    - violations: yes
+  - name: example-disallowed-ssvct-nonamename
+    object: examples/storage-class/example_disallowed_ssvct_nonamename.yaml
+    assertions:
+    - violations: yes
+- name: storageclass-allowlist
+  template: template.yaml
+  constraint: examples/storage-class-allowlist/constraint.yaml
+  cases:
+  - name: allowed-storage-class-pvc
+    object: examples/storage-class-allowlist/example_allowed.yaml
+    inventory:
+    - examples/storage-class-allowlist/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: no
+  - name: disallowed-storage-class-pvc
+    object: examples/storage-class-allowlist/example_disallowed.yaml
+    inventory:
+    - examples/storage-class-allowlist/example_inventory_allowed_storageclass.yaml
+    assertions:
+    - violations: yes

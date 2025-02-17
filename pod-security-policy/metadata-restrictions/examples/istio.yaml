@@ -1,0 +1,39 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: MetadataRestrictions
+metadata:
+  name: enforce-protected-b-istio
+spec:
+  match:
+    namespaceSelector:
+      matchExpressions:
+        - key: istio-injection
+          operator: In
+          values: ["enabled"]
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    labelSelector:
+      matchExpressions:
+        - key: data.ssc-spc.gc.ca/classification
+          operator: In
+          values:
+            - protected-b
+  parameters:
+    annotations:
+      - key: sidecar.istio.io/inject
+        fallback: 'true'
+        allowedValues:
+          - 'true'
+        allowedRegex: []
+      - key: traffic.sidecar.istio.io/excludeOutboundPorts
+        allowedValues: []
+        allowedRegex: []
+      - key: traffic.sidecar.istio.io/excludeOutboundIPRanges
+        allowedValues: []
+        allowedRegex: []
+      - key: traffic.sidecar.istio.io/excludeInboundPorts
+        allowedValues: []
+        allowedRegex: []
+      - key: traffic.sidecar.istio.io/excludeInboundIPRanges
+        allowedValues: []
+        allowedRegex: []

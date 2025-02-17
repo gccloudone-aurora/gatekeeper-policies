@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: test
+  namespace: other
+spec:
+  hosts:
+  - test.ca
+  - testing.ca
+  http:
+  - match:
+    - uri:
+        prefix: /finance
+    - uri:
+        exact: /finance
+    - uri:
+        regex: ^/finance
+  tcp:
+  - route:
+    - destination:
+        host: finance.test.svc.cluster.local
+  tls:
+  - match:
+    - sniHosts:
+      - finance.test.scv.cluster.local

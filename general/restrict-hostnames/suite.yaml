@@ -1,0 +1,219 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: restrict-hostnames
+tests:
+- name: restrict-hostname
+  template: template.yaml
+  constraint: examples/constraint.yaml
+  cases:
+  ### Ingresses
+  - name: ingress-allowed-paths
+    object: examples/ingress_multiple_paths.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: no
+  - name: ingress-allowed-specific-path
+    object: examples/ingress_specific_path.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: no
+  - name: ingress-denied-specific-path
+    object: examples/ingress_multiple_paths.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: yes
+  - name: ingress-allowed-case-mismatch
+    object: examples/ingress_allowed_case_mismatch.yaml
+    inventory:
+    - examples/ns_case.yaml
+    assertions:
+    - violations: no # Case mismatches are permitted (normalized out)
+  - name: ingress-allowed-namespace-path-empty
+    object: examples/ingress_multiple_paths.yaml
+    inventory:
+    - examples/ns_path_empty.yaml
+    assertions:
+    - violations: no # Empty path is treated as equivalent to /, allowing all paths
+  - name: ingress-denied-no-allowedhosts
+    object: examples/ingress_multiple_paths.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: ingress-denied-no-allowedhosts
+    object: examples/ingress_multiple_paths.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: ingress-denied-no-path-no-allowedhosts
+    object: examples/ingress_no_path.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: ingress-allowed-no-path-allowed-host
+    object: examples/ingress_no_path.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: no
+  - name: ingress-allowed-exempt-host
+    object: examples/ingress_exempt_host.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: no # Ingress successfully uses exempt host in namespace with no allowed hosts
+  - name: ingress-allowed-no-host
+    object: examples/ingress_no_host.yaml
+    inventory:
+    - examples/ns_allow_no_host.yaml
+    assertions:
+    - violations: no 
+  - name: ingress-denied-no-host
+    object: examples/ingress_no_host.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: yes 
+  - name: ingress-conflict
+    object: examples/vs_conflict.yaml
+    inventory:
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: yes
+  - name: ingress-conflict-permitted
+    object: examples/vs_conflict.yaml
+    inventory:
+    - examples/ns_allow_conflict.yaml
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: no
+  ### Virtual Services
+  - name: vs-allowed-specific-path
+    object: examples/vs_specific_path.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: no
+  - name: vs-denied-host
+    object: examples/vs_host_not_allowed.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: yes
+  - name: vs-multiple-allowed-hosts
+    object: examples/vs_multiple_hosts.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: no
+  - name: vs-allowed-regex-match
+    object: examples/vs_regex.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: no
+  - name: vs-denied-not-all-hosts-allowed
+    object: examples/vs_not_all_hosts_allowed.yaml
+    inventory:
+    - examples/ns_specific_path.yaml
+    assertions:
+    - violations: yes
+  - name: vs-denied-no-allowedhosts
+    object: examples/vs_multiple_hosts.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: vs-allowed-namespace-hosts.yaml
+    object: examples/vs_namespace_hosts.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: vs-denied-no-path-no-allowedhosts
+    object: examples/vs_no_path.yaml
+    inventory:
+    - examples/ns_no_allowedhosts.yaml
+    assertions:
+    - violations: yes
+  - name: vs-allowed-no-path-allowed-hosts
+    object: examples/vs_no_path.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: no
+  - name: vs-allowed-no-host
+    object: examples/vs_no_host.yaml
+    inventory:
+    - examples/ns_allow_no_host.yaml
+    assertions:
+    - violations: no 
+  - name: vs-denied-no-host
+    object: examples/vs_no_host.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: yes
+  - name: vs-conflict
+    object: examples/vs_conflict.yaml
+    inventory:
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: yes
+  - name: vs-conflict-permitted
+    object: examples/vs_conflict.yaml
+    inventory:
+    - examples/ns_allow_conflict.yaml
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: no
+  ### Destination Rules
+  - name: dr-allowed
+    object: examples/dr.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: no
+  - name: dr-denied-host
+    object: examples/dr_host_not_allowed.yaml
+    inventory:
+    - examples/ns.yaml
+    assertions:
+    - violations: yes
+  - name: dr-conflict
+    object: examples/dr_conflict.yaml
+    inventory:
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: yes
+  - name: dr-conflict-permitted
+    object: examples/dr_conflict.yaml
+    inventory:
+    - examples/ns_allow_conflict.yaml
+    - examples/ns.yaml
+    - examples/vs_multiple_hosts.yaml
+    - examples/ingress_multiple_paths.yaml
+    - examples/dr.yaml
+    assertions:
+    - violations: no

@@ -1,0 +1,33 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: RestrictPodAnnotations
+tests:
+- name: restrict-annotations
+  template: template.yaml
+  constraint: examples/constraint.yaml
+  cases:
+  - name: annotations-restricted
+    object: examples/annotation-restricted.yaml
+    inventory:
+    - examples/solution-namespace.yaml
+    assertions:
+    - violations: yes    
+  - name: annotations-permitted
+    object: examples/annotation-permitted.yaml
+    inventory:
+    - examples/solution-namespace.yaml
+    assertions:
+    - violations: no    
+  - name: system-ns-pod-annotations-restricted
+    object: examples/annotation-restricted.yaml
+    inventory:
+    - examples/system-namespace.yaml
+    assertions:
+    - violations: no   
+  - name: system-ns-pod-annotations-permitted
+    object: examples/annotation-permitted.yaml
+    inventory:
+    - examples/system-namespace.yaml
+    assertions:
+    - violations: no

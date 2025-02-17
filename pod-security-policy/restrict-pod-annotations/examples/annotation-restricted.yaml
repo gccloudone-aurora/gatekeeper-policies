@@ -1,0 +1,17 @@
+# Assert: 
+#   Istio = yes
+#   namespace purpose : solution
+#   sidecar.istio.io/userVolumeMount : /mnt/my_volume
+# result not pass 
+apiVersion: v1
+kind: Pod
+metadata:  
+  name: delta
+  namespace: deltaquadrant
+  labels:
+    app.kubernetes.io/instance: delta-webapp
+  annotations:
+    prometheus.io/path: /stats/prometheus
+    prometheus.io/port: '15020'
+    prometheus.io/scrape: 'true'
+    sidecar.istio.io/userVolumeMount: /mnt/my_volume

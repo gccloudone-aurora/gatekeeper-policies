@@ -1,0 +1,63 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: block-operations
+tests:
+  - name: block-operations
+    template: template.yaml
+    constraint: examples/constraint.yaml
+    cases:
+      - name: example-allowed-deployment
+        object: examples/resources/deployment.yaml
+        inventory:
+          - examples/ns_with_ato.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed-job
+        object: examples/resources/job.yaml
+        inventory:
+          - examples/ns_with_ato.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed-pod
+        object: examples/resources/pod.yaml
+        inventory:
+          - examples/ns_with_ato.yaml
+        assertions:
+          - violations: no
+      - name: example-allowed-statefulset
+        object: examples/resources/statefulset.yaml
+        inventory:
+          - examples/ns_with_ato.yaml
+        assertions:
+          - violations: no
+      - name: example-denied-deployment
+        object: examples/resources/deployment.yaml
+        inventory:
+          - examples/ns_empty_string_ato.yaml
+        assertions:
+          - violations: yes
+      - name: example-denied-job
+        object: examples/resources/job.yaml
+        inventory:
+          - examples/ns_empty_string_ato.yaml
+        assertions:
+          - violations: yes
+      - name: example-denied-pod
+        object: examples/resources/pod.yaml
+        inventory:
+          - examples/ns_empty_string_ato.yaml
+        assertions:
+          - violations: yes
+      - name: example-denied-statefulset
+        object: examples/resources/statefulset.yaml
+        inventory:
+          - examples/ns_empty_string_ato.yaml
+        assertions:
+          - violations: yes
+      - name: example-denied-statefulset
+        object: examples/resources/statefulset.yaml
+        inventory:
+          - examples/ns_without_ato_annotation.yaml
+        assertions:
+          - violations: yes

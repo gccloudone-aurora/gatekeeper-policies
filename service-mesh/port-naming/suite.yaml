@@ -1,0 +1,21 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: portnaming
+tests:
+- name: port-naming
+  template: template.yaml
+  constraint: examples/constraint.yaml
+  cases:
+  - name: port-name-bad
+    object: examples/port-name-bad.yaml
+    assertions:
+    - violations: 1
+  - name: port-name-http
+    object: examples/port-name-http.yaml
+    assertions:
+    - violations: 0
+  - name: port-name-tcp
+    object: examples/port-name-tcp.yaml
+    assertions:
+    - violations: 0

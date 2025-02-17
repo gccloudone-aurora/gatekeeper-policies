@@ -1,0 +1,51 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: blockoperations
+  annotations:
+    metadata.gatekeeper.sh/title: "Block Operations"
+    metadata.gatekeeper.sh/version: 1.0.1
+    description: >-
+      Namespaces without an ATO should be prevented from deploying their workloads within Production.
+spec:
+  crd:
+    spec:
+      names:
+        kind: BlockOperations
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package blockoperations
+
+        namespace_has_annotation[namespace_name] {
+          annotation := data.inventory.cluster["v1"].Namespace[namespace_name]["metadata"]["annotations"]["project.ssc-spc.gc.ca/authority-to-operate"]
+          annotation != ""  # Ensure the annotation exists and is not an empty string
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          namespace := input.review.object.metadata.namespace
+          not namespace_has_annotation[namespace]
+          msg := sprintf("The namespace '%v' does not have authority to operate.", [namespace])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Deployment"
+          namespace := input.review.object.metadata.namespace
+          not namespace_has_annotation[namespace]
+          msg := sprintf("The namespace '%v' does not have authority to operate.", [namespace])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind== "StatefulSet"
+          namespace := input.review.object.metadata.namespace
+          not namespace_has_annotation[namespace]
+          msg := sprintf("The namespace '%v' does not have authority to operate.", [namespace])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Job"
+          namespace := input.review.object.metadata.namespace
+          not namespace_has_annotation[namespace]
+          msg := sprintf("The namespace '%v' does not have authority to operate.", [namespace])
+        }

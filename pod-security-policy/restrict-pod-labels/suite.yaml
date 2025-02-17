@@ -1,0 +1,33 @@
+kind: Suite
+apiVersion: test.gatekeeper.sh/v1alpha1
+metadata:
+  name: RestrictPodlabels
+tests:
+- name: restrict-labels
+  template: template.yaml
+  constraint: examples/constraint.yaml
+  cases:
+  - name: labels-restricted
+    object: examples/labels-restricted.yaml
+    inventory:
+    - examples/solution-namespace.yaml
+    assertions:
+    - violations: yes 
+  - name: labels-permitted
+    object: examples/labels-permitted.yaml
+    inventory:
+    - examples/solution-namespace.yaml
+    assertions:
+    - violations: no 
+  - name: system-ns-pod-labels-permitted
+    object: examples/labels-permitted.yaml
+    inventory:
+    - examples/system-namespace.yaml
+    assertions:
+    - violations: no 
+  - name: system-ns-pod-labels-restricted
+    object: examples/labels-restricted.yaml
+    inventory:
+    - examples/system-namespace.yaml
+    assertions:
+    - violations: no
