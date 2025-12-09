@@ -1,0 +1,14 @@
+# Test case: Key-value ban with matching key but different value
+# Assert: 
+#   namespace purpose: solution
+#   app.kubernetes.io/version: "v1.0.0" (different value, not banned)
+#   Expected: NO VIOLATION (key matches but value doesn't match the banned value)
+apiVersion: v1
+kind: Pod
+metadata:  
+  name: test-pod
+  namespace: deltaquadrant
+  annotations:
+    app.kubernetes.io/version: "v1.0.0"
+    app.kubernetes.io/name: "myapp"
+
