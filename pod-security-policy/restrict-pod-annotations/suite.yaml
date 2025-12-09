@@ -39,6 +39,19 @@ tests:
     - examples/namespaces/solution-namespace.yaml
     assertions:
     - violations: no
+  # Exemption tests
+  - name: exempt-key-value-permitted
+    object: examples/pods/permitted-exempt-key-value.yaml
+    inventory:
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: no
+  - name: not-exempted-violation
+    object: examples/pods/violation-not-exempted.yaml
+    inventory:
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: yes
   # System namespace tests (should always pass regardless of annotations)
   - name: system-ns-key-only-ban-permitted
     object: examples/pods/violation-key-only-ban.yaml

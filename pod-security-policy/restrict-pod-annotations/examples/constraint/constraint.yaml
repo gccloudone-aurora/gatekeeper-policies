@@ -36,3 +36,7 @@ spec:
       value: "deprecated"
     - key: deployment.kubernetes.io/revision
       value: "rollback"
+    exemptAnnotations:
+    # Key-value exemptions (exempt specific key-value pairs)
+    - key: sidecar.istio.io/userVolumeMount
+      value: /mnt/approved-path
