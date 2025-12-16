@@ -1,0 +1,14 @@
+# Test case: Pod with exempted key-value annotation
+# Assert: 
+#   namespace purpose: solution
+#   sidecar.istio.io/userVolumeMount: /mnt/approved-path (exempted value)
+#   Expected: NO VIOLATION (key is banned but this specific value is exempted)
+apiVersion: v1
+kind: Pod
+metadata:  
+  name: test-pod
+  namespace: deltaquadrant
+  annotations:
+    sidecar.istio.io/userVolumeMount: /mnt/approved-path
+    prometheus.io/scrape: 'true'
+

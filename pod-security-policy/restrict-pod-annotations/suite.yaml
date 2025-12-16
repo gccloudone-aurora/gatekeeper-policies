@@ -5,29 +5,69 @@ metadata:
 tests:
 - name: restrict-annotations
   template: template.yaml
-  constraint: examples/constraint.yaml
+  constraint: examples/constraint/constraint.yaml
   cases:
-  - name: annotations-restricted
-    object: examples/annotation-restricted.yaml
+  # Key-only ban tests (any value is forbidden)
+  - name: key-only-ban-violation
+    object: examples/pods/violation-key-only-ban.yaml
     inventory:
-    - examples/solution-namespace.yaml
+    - examples/namespaces/solution-namespace.yaml
     assertions:
-    - violations: yes    
-  - name: annotations-permitted
-    object: examples/annotation-permitted.yaml
+    - violations: yes
+  # Key-value ban tests (only specific value is forbidden)
+  - name: key-value-ban-violation
+    object: examples/pods/violation-key-value-ban.yaml
     inventory:
-    - examples/solution-namespace.yaml
+    - examples/namespaces/solution-namespace.yaml
     assertions:
-    - violations: no    
-  - name: system-ns-pod-annotations-restricted
-    object: examples/annotation-restricted.yaml
+    - violations: yes
+  - name: key-value-ban-permitted
+    object: examples/pods/permitted-key-value-ban.yaml
     inventory:
-    - examples/system-namespace.yaml
+    - examples/namespaces/solution-namespace.yaml
     assertions:
-    - violations: no   
-  - name: system-ns-pod-annotations-permitted
-    object: examples/annotation-permitted.yaml
+    - violations: no
+  - name: general-permitted
+    object: examples/pods/permitted-general.yaml
     inventory:
-    - examples/system-namespace.yaml
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: no
+  - name: no-annotations-permitted
+    object: examples/pods/permitted-no-annoations.yaml
+    inventory:
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: no
+  # Exemption tests
+  - name: exempt-key-value-permitted
+    object: examples/pods/permitted-exempt-key-value.yaml
+    inventory:
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: no
+  - name: not-exempted-violation
+    object: examples/pods/violation-not-exempted.yaml
+    inventory:
+    - examples/namespaces/solution-namespace.yaml
+    assertions:
+    - violations: yes
+  # System namespace tests (should always pass regardless of annotations)
+  - name: system-ns-key-only-ban-permitted
+    object: examples/pods/violation-key-only-ban.yaml
+    inventory:
+    - examples/namespaces/system-namespace.yaml
+    assertions:
+    - violations: no
+  - name: system-ns-key-value-ban-permitted
+    object: examples/pods/violation-key-value-ban.yaml
+    inventory:
+    - examples/namespaces/system-namespace.yaml
+    assertions:
+    - violations: no
+  - name: system-ns-general-permitted
+    object: examples/pods/permitted-general.yaml
+    inventory:
+    - examples/namespaces/system-namespace.yaml
     assertions:
     - violations: no

@@ -8,26 +8,86 @@ spec:
       names:
         kind: RestrictPodAnnotations
       validation:
-        # Schema for the `parameters` field
         openAPIV3Schema:
           type: object
           properties:
-            labels:
+            bannedAnnotations:
               type: array
               items:
-                type: string
+                type: object
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: string
+            exemptAnnotations:
+              type: array
+              items:
+                type: object
+                required:
+                  - key
+                  - value
+                properties:
+                  key:
+                    type: string
+                  value:
+                    type: string
   targets:
     - target: admission.k8s.gatekeeper.sh
       rego: |-
-       package restrictpodannotations
-      
-       violation[{"msg": msg, "details": {"pod_annotations": not_allow}}] {
-          disallowed := {annotations | annotations := input.parameters.annotations[_]}
-          provided   := {annotations | input.review.object.metadata.annotations[annotations]}
+        package restrictpodannotations
 
-          # disallowed should be a non empty intersection of provided to return false
-          not_allow  := provided & disallowed
-          count(not_allow) > 0
+        violation[{"msg": msg}] {
+          # 1. Iterate over annotations in the object being reviewed
+          some input_key
+          input_val := input.review.object.metadata.annotations[input_key]
+          
+          # 2. Iterate over the banned list provided in the Constraint
+          banned := input.parameters.bannedAnnotations[_]
 
-          msg := sprintf("You are not allowed to use the following annotations: %v", [not_allow])
+          # 3. Check if the keys match
+          banned.key == input_key
+
+          # 4. Check if it's a violation based on value
+          is_violation(banned, input_val)
+
+          # 5. Check if this annotation is exempted
+          not is_exempted(input_key, input_val)
+
+          msg := get_message(banned, input_key, input_val)
+        }
+
+        # Scenario A: The ban rule specifies a value, and it matches the input
+        is_violation(banned, input_val) {
+            banned.value == input_val
+        }
+
+        # Scenario B: The ban rule does NOT specify a value (ban the key entirely)
+        is_violation(banned, input_val) {
+            not has_field(banned, "value")
+        }
+
+        # Helper to check for field existence
+        has_field(object, field) = true {
+            object[field]
+        }
+
+        # Helper to format message dynamically
+        get_message(banned, key, val) = msg {
+            has_field(banned, "value")
+            msg := sprintf("The annotation '%v' cannot be set to value '%v'.", [key, val])
+        }
+
+        get_message(banned, key, val) = msg {
+            not has_field(banned, "value")
+            msg := sprintf("The annotation '%v' is forbidden regardless of value.", [key])
+        }
+
+        # Check if an annotation is exempted (key-value pair must match exactly)
+        # Returns false if exemptAnnotations is not defined
+        is_exempted(input_key, input_val) {
+            has_field(input.parameters, "exemptAnnotations")
+            exempt := input.parameters.exemptAnnotations[_]
+            exempt.key == input_key
+            exempt.value == input_val
         }

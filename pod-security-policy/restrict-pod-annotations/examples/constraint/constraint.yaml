@@ -1,0 +1,42 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: RestrictPodAnnotations
+metadata:
+  name: restrict-pod-annotations
+spec:
+  match:
+    namespaceSelector:
+      matchExpressions:
+        - key: namespace.ssc-spc.gc.ca/purpose
+          operator: In
+          values:
+            - solution
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+  parameters:
+    bannedAnnotations:
+    # Key-only bans (any value is forbidden)
+    - key: galley.istio.io/analyze-suppress
+    - key: inject.istio.io/templates
+    - key: istio.io/rev
+    - key: proxy.istio.io/config
+    - key: sidecar.istio.io/inject
+    - key: sidecar.istio.io/controlPlaneAuthPolicy
+    - key: sidecar.istio.io/discoveryAddress
+    - key: sidecar.istio.io/bootstrapOverride
+    - key: traffic.sidecar.istio.io/excludeInboundPorts
+    - key: traffic.istio.io/nodeSelector
+    - key: sidecar.istio.io/proxyImage
+    - key: sidecar.istio.io/proxyImageType
+    - key: sidecar.istio.io/userVolume
+    - key: sidecar.istio.io/userVolumeMount
+    - key: status.sidecar.istio.io/port
+    # Key-value bans (only specific value is forbidden)
+    - key: app.kubernetes.io/version
+      value: "deprecated"
+    - key: deployment.kubernetes.io/revision
+      value: "rollback"
+    exemptAnnotations:
+    # Key-value exemptions (exempt specific key-value pairs)
+    - key: sidecar.istio.io/userVolumeMount
+      value: /mnt/approved-path

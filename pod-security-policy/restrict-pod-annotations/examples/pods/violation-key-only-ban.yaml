@@ -1,0 +1,14 @@
+# Test case: Key-only ban with matching key but different value
+# Assert: 
+#   namespace purpose: solution
+#   sidecar.istio.io/userVolumeMount: /different/path (key is banned regardless of value)
+#   Expected: VIOLATION (key-only ban means any value is forbidden)
+apiVersion: v1
+kind: Pod
+metadata:  
+  name: test-pod
+  namespace: deltaquadrant
+  annotations:
+    sidecar.istio.io/userVolumeMount: /different/path
+    prometheus.io/scrape: 'true'
+

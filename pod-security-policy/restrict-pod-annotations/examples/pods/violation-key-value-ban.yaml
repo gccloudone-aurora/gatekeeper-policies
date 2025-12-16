@@ -1,0 +1,14 @@
+# Test case: Key-value ban with matching key and banned value
+# Assert: 
+#   namespace purpose: solution
+#   app.kubernetes.io/version: "deprecated" (banned value)
+#   Expected: VIOLATION (key and value match the ban)
+apiVersion: v1
+kind: Pod
+metadata:  
+  name: test-pod
+  namespace: deltaquadrant
+  annotations:
+    app.kubernetes.io/version: "deprecated"
+    app.kubernetes.io/name: "myapp"
+

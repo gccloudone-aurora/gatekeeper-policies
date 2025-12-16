@@ -1,8 +1,7 @@
+# Test case: Pod with permitted annotations (no banned keys)
 # Assert: 
-#   Istio = yes
-#   namespace purpose : solution
-#   sidecar.istio.io/userVolumeMount : /mnt/my_volume
-# result not pass 
+#   namespace purpose: solution
+#   Expected: NO VIOLATION (no banned annotations present)
 apiVersion: v1
 kind: Pod
 metadata:  
@@ -14,4 +13,3 @@ metadata:
     prometheus.io/path: /stats/prometheus
     prometheus.io/port: '15020'
     prometheus.io/scrape: 'true'
-    sidecar.istio.io/userVolumeMount: /mnt/my_volume
