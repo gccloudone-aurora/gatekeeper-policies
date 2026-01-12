@@ -68,7 +68,7 @@ jobs:
     - name: Deploy Istio
       run: |
         curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${ISTIO_VERSION} sh -
-        $PWD/istio-${ISTIO_VERSION}/bin/istioctl install --set profile=demo
+        $PWD/istio-${ISTIO_VERSION}/bin/istioctl install -y --set profile=demo
         rm -rf $PWD/istio-${ISTIO_VERSION}
 
     - name: Deploy Gatekeeper
