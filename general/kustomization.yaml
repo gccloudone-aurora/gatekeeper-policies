@@ -27,3 +27,4 @@ bases:
   - pod-disruption-budget
   - restrict-hostnames
   - storage-class
+  - verify-deprecated-apis
