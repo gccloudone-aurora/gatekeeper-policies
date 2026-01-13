@@ -22,5 +22,6 @@ kind: Kustomization
 # etc. that differ from the common base).
 bases:
   - metadata-restrictions
+  - read-only-root-filesystem
   - restrict-pod-annotations
   - restrict-pod-labels
