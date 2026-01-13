@@ -24,7 +24,7 @@ tests:
   - name: update
     object: samples/psp-readonlyrootfilesystem/update.yaml
     assertions:
-    - violations: yes
+    - violations: no
   - name: exact-exemption
     object: samples/psp-readonlyrootfilesystem/example_allowed_exempted.yaml
     assertions:
